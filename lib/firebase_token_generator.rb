@@ -4,12 +4,25 @@ require "openssl"
 
 module Firebase
 
+  # This class handles generating signed authentication tokens for use with Firebase
   class FirebaseTokenGenerator
 
+    # When creating an instance of the generator, you must provide your Firebase Application Secret
     def initialize(secret)
       @secret = secret
     end
 
+    # Returns a signed Firebase Authentication Token
+    # Takes the following arguments:
+    # [auth_data] A hash of arbitrary data to be included in the token
+    # [options] An optional hash of extra claims that may be included in the token. Allowed values are:
+    #   [expires] Epoch time after which the token will no longer be valid
+    #   [notBefore] Epoch time before which the token will not be valid
+    #   [admin] If set to true, this client will bypass all security rules
+    #   [debug] If set to true, this client will receive debug information about the security rules
+    #   [simulate] (internal-only for now) Runs security rules but makes no data changes
+    #
+    # Throws ArgumentError if given an invalid option
     def create_token(auth_data, options = {})
       claims = create_options_claims(options)
       claims[:v] = TOKEN_VERSION
