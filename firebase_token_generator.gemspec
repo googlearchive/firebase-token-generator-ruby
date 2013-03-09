@@ -7,5 +7,5 @@ Gem::Specification.new do |s|
   s.authors       = ["Greg Soltis"]
   s.email         = "greg@firebase.com"
   s.files         = ["lib/firebase_token_generator.rb"]
-  s.homepage      = "http://github.com/firebase/FirebaseTokenGenerator-ruby"
+  s.homepage      = "http://github.com/firebase/firebase-token-generator-ruby"
 end
