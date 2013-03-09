@@ -49,7 +49,7 @@ module Firebase
       opts = {}
       options.each do |key, value|
         if CLAIMS_MAP.include?(key.to_sym) then
-          opts[key.to_sym] = value
+          opts[CLAIMS_MAP[key.to_sym]] = value
         else
           raise ArgumentError, "#{key.to_s} is not a valid option"
         end
