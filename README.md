@@ -4,7 +4,7 @@ A Ruby library for generating JWT that can be used for authentication in a Fireb
 
 ## Installation
 
-gem install firebase-token-generator
+gem install firebase_token_generator
 
 ## Usage
 
