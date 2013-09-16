@@ -1,6 +1,8 @@
+require "rubygems"
 require "json"
 require "base64"
 require "openssl"
+require "date"
 
 module Firebase
 
@@ -24,6 +26,9 @@ module Firebase
     #
     # Throws ArgumentError if given an invalid option
     def create_token(auth_data, options = {})
+      if auth_data.empty? and options.empty?
+        raise ArgumentError, "FirebaseTokenGenerator.create_token: data is empty and no options are set.  This token will have no effect on Firebase."
+      end
       claims = create_options_claims(options)
       claims[:v] = TOKEN_VERSION
       claims[:iat] = Time.now.to_i
@@ -48,6 +53,9 @@ module Firebase
     def create_options_claims(options)
       opts = {}
       options.each do |key, value|
+        if value.respond_to?(:strftime) then
+          value = value.strftime("%s").to_i
+        end
         if CLAIMS_MAP.include?(key.to_sym) then
           opts[CLAIMS_MAP[key.to_sym]] = value
         else
