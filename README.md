@@ -34,10 +34,10 @@ this snippet of Ruby code:
 ```ruby
 require "firebase_token_generator"
 
-arbitraryPayload = {:auth_data => "foo", :other_auth_data => "bar"}
+arbitraryAuthPayload = {:auth_data => "foo", :other_auth_data => "bar"}
 
 generator = Firebase::FirebaseTokenGenerator.new("<YOUR_FIREBASE_SECRET>")
-token = generator.create_token(arbitraryPayload)
+token = generator.create_token(arbitraryAuthPayload)
 ```
 
 The arbitrary payload object passed into `create_token()` is then available for use within your
@@ -72,9 +72,9 @@ Here is an example of how to use the second `options` argument:
 ```ruby
 require "firebase_token_generator"
 
-arbitraryPayload = {:auth_data => "foo", :other_auth_data => "bar"}
+arbitraryAuthPayload = {:auth_data => "foo", :other_auth_data => "bar"}
 options = {:admin => true}
 
 generator = Firebase::FirebaseTokenGenerator.new("<YOUR_FIREBASE_SECRET>")
-token = generator.create_token(arbitraryPayload, options)
+token = generator.create_token(arbitraryAuthPayload, options)
 ```
