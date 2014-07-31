@@ -1,34 +1,80 @@
-# FirebaseTokenGenerator-ruby
+# Firebase Token Generator - Ruby
 
-A Ruby library for generating JWT that can be used for authentication in a Firebase app.
+[Firebase Custom Login](https://www.firebase.com/docs/web/guide/simple-login/custom.html)
+gives you complete control over user authentication by allowing you to authenticate users
+with secure JSON Web Tokens (JWTs). The auth payload stored in those tokens is available
+for use in your Firebase [security rules](https://www.firebase.com/docs/security/api/rule/).
+This is a token generator library for Ruby which allows you to easily create those JWTs.
+
 
 ## Installation
 
-    gem install firebase_token_generator
+The Firebase Ruby token generator is available via `gem`:
 
-## Usage
+```bash
+$ gem install firebase_token_generator
+```
 
-Using the library to generate a valid, signed token:
 
-    require "firebase_token_generator"
+## A Note About Security
 
-    SECRET = '<YOUR FIREBASE APP SECRET>'
-    options = {:admin => true}
-    auth_data = {:auth_data => 'foo', :other_auth_data => 'bar'}
+**IMPORTANT:** Because token generation requires your Firebase Secret, you should only generate
+tokens on *trusted servers*. Never embed your Firebase Secret directly into your application and
+never share your Firebase Secret with a connected client.
 
-    generator = Firebase::FirebaseTokenGenerator.new(SECRET)
-    token = generator.create_token(auth_data, options)
 
-The options argument is an optional dictionary of additional properties for the token. The list of possible options is:
+## Generating Tokens
 
-* expires - DateTime or epoch time after which the token will be considered invalid
-* notBefore - DateTime or epoch time before which the token will be considered invalid
-* admin - if set to True, this client will bypass security rules
-* debug - if set to True, the client will receive information about security rule execution
-* simulate - (internal-only for now) if True, Firebase will run security rules but not actually make any data changes
+To generate tokens, you'll need your Firebase Secret which you can find by entering your Firebase
+URL into a browser and clicking the "Secrets" tab on the left-hand navigation menu.
 
-See the [Firebase Authentication Docs](https://www.firebase.com/docs/security/authentication.html) for more information about authentication tokens.
+Once you've downloaded the library and grabbed your Firebase Secret, you can generate a token with
+this snippet of Ruby code:
 
-License
--------
-[MIT](http://firebase.mit-license.org)
+```ruby
+require "firebase_token_generator"
+
+arbitraryAuthPayload = {:auth_data => "foo", :other_auth_data => "bar"}
+
+generator = Firebase::FirebaseTokenGenerator.new("<YOUR_FIREBASE_SECRET>")
+token = generator.create_token(arbitraryAuthPayload)
+```
+
+The arbitrary payload object passed into `create_token()` is then available for use within your
+security rules via the [`auth` variable](https://www.firebase.com/docs/security/api/rule/auth.html).
+This is how you pass trusted authentication details (e.g. the client's user ID) into your
+Firebase rules.
+
+
+## Token Options
+
+A second `options` argument can be passed to `create_token()` to modify how Firebase treats the
+token. Available options are:
+
+* **expires** (Integer or DateTime) - A timestamp (as number of seconds since the epoch) or
+`DateTime` denoting the time after which this token should no longer be valid.
+
+* **notBefore** (Integer or DateTime) - A timestamp (as number of seconds since the epoch) or
+`DateTime` denoting the time before which this token should be rejected by the server.
+
+* **admin** (Boolean) - Set to `true` if you want to disable all security rules for this client.
+This will provide the client with read and write access to your entire Firebase.
+
+* **debug** (Boolean) - Set to `true` to enable debug output from your security rules. You should
+generally *not* leave this set to `true` in production (as it slows down the rules implementation
+and gives your users visibility into your rules), but it can be helpful for debugging.
+
+* **simulate** (Boolean) - If `true`, Firebase will run security rules but not actually make any
+data changes. Note that this is internal-only for now.
+
+Here is an example of how to use the second `options` argument:
+
+```ruby
+require "firebase_token_generator"
+
+arbitraryAuthPayload = {:auth_data => "foo", :other_auth_data => "bar"}
+options = {:admin => true}
+
+generator = Firebase::FirebaseTokenGenerator.new("<YOUR_FIREBASE_SECRET>")
+token = generator.create_token(arbitraryAuthPayload, options)
+```
