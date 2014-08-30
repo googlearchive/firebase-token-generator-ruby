@@ -39,7 +39,7 @@ module Firebase
       claims[:d] = auth_data
       token = encode_token(claims)
       if (token.length > 1024)
-        raise RuntimeError, "Generated token is too long"
+        raise RuntimeError, "Generated token is too long."
       end
       token
     end
