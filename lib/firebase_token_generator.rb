@@ -12,7 +12,7 @@ module Firebase
     # When creating an instance of the generator, you must provide your Firebase Application Secret
     def initialize(secret)
       if (!secret.is_a?(String))
-        raise ArgumentError, "FirebaseTokenGenerator: secret must be a string"
+        raise ArgumentError, "FirebaseTokenGenerator: secret must be a string."
       end
       @secret = secret
     end
