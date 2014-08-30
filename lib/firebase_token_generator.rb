@@ -65,9 +65,9 @@ module Firebase
       end
       contains_uid = (!auth_data.nil? and auth_data.has_key?(:uid))
       if ((!contains_uid and !is_admin_token) or (contains_uid and !auth_data[:uid].is_a?(String)))
-        raise ArgumentError, "FirebaseTokenGenerator.create_token: auth data must contain a \"uid\" key that must be a string."
+        raise ArgumentError, "FirebaseTokenGenerator.create_token: auth data must contain a :uid key that must be a string."
       elsif (contains_uid and (auth_data[:uid].length > 256))
-        raise ArgumentError, "FirebaseTokenGenerator.create_token: auth data must contain a \"uid\" key that must not be longer than 256 bytes."
+        raise ArgumentError, "FirebaseTokenGenerator.create_token: auth data must contain a :uid key that must not be longer than 256 bytes."
       end
     end
 
