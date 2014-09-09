@@ -40,11 +40,13 @@ generator = Firebase::FirebaseTokenGenerator.new("<YOUR_FIREBASE_SECRET>")
 token = generator.create_token(payload)
 ```
 
-The payload object passed into `create_token()` is then available for use within your
+The payload passed to `create_token()` is made available for use within your
 security rules via the [`auth` variable](https://www.firebase.com/docs/security/api/rule/auth.html).
-This is how you pass trusted authentication details (e.g. the client's user ID) into your
-Firebase rules. It must contain a `:uid`, which must be a string of less than 256 chars long,
-and the generated token must be less than 1024 chars long in total.
+This is how you pass trusted authentication details (e.g. the client's user ID)
+to your Firebase security rules. The payload can contain any data of your
+choosing, however it must contain a `:uid` key, which must be a string of less
+than 256 characters. The generated token must be less than 1024 characters in
+total.
 
 
 ## Token Options
