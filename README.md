@@ -34,16 +34,19 @@ this snippet of Ruby code:
 ```ruby
 require "firebase_token_generator"
 
-arbitraryAuthPayload = {:auth_data => "foo", :other_auth_data => "bar"}
+payload = {:uid => "1", :auth_data => "foo", :other_auth_data => "bar"}
 
 generator = Firebase::FirebaseTokenGenerator.new("<YOUR_FIREBASE_SECRET>")
-token = generator.create_token(arbitraryAuthPayload)
+token = generator.create_token(payload)
 ```
 
-The arbitrary payload object passed into `create_token()` is then available for use within your
+The payload passed to `create_token()` is made available for use within your
 security rules via the [`auth` variable](https://www.firebase.com/docs/security/api/rule/auth.html).
-This is how you pass trusted authentication details (e.g. the client's user ID) into your
-Firebase rules.
+This is how you pass trusted authentication details (e.g. the client's user ID)
+to your Firebase security rules. The payload can contain any data of your
+choosing, however it must contain a `:uid` key, which must be a string of less
+than 256 characters. The generated token must be less than 1024 characters in
+total.
 
 
 ## Token Options
@@ -72,9 +75,9 @@ Here is an example of how to use the second `options` argument:
 ```ruby
 require "firebase_token_generator"
 
-arbitraryAuthPayload = {:auth_data => "foo", :other_auth_data => "bar"}
+payload = {:uid => "1", :auth_data => "foo", :other_auth_data => "bar"}
 options = {:admin => true}
 
 generator = Firebase::FirebaseTokenGenerator.new("<YOUR_FIREBASE_SECRET>")
-token = generator.create_token(arbitraryAuthPayload, options)
+token = generator.create_token(payload, options)
 ```

@@ -11,6 +11,9 @@ module Firebase
 
     # When creating an instance of the generator, you must provide your Firebase Application Secret
     def initialize(secret)
+      if (!secret.is_a?(String))
+        raise ArgumentError, "FirebaseTokenGenerator: secret must be a string."
+      end
       @secret = secret
     end
 
@@ -24,16 +27,22 @@ module Firebase
     #   [debug] If set to true, this client will receive debug information about the security rules
     #   [simulate] (internal-only for now) Runs security rules but makes no data changes
     #
-    # Throws ArgumentError if given an invalid option
+    # Throws ArgumentError if given invalid data or an invalid option
+    # Throws RuntimeError if generated token is too long
     def create_token(auth_data, options = {})
-      if auth_data.empty? and options.empty?
+      if (auth_data.nil? or auth_data.empty?) and (options.nil? or options.empty?)
         raise ArgumentError, "FirebaseTokenGenerator.create_token: data is empty and no options are set.  This token will have no effect on Firebase."
       end
+      validate_auth_data(auth_data, (!options.nil? and options[:admin] == true))
       claims = create_options_claims(options)
       claims[:v] = TOKEN_VERSION
       claims[:iat] = Time.now.to_i
       claims[:d] = auth_data
-      encode_token(claims)
+      token = encode_token(claims)
+      if (token.length > 1024)
+        raise RuntimeError, "FirebaseTokenGenerator.create_token: generated token is too long."
+      end
+      token
     end
 
     private
@@ -50,6 +59,18 @@ module Firebase
         :simulate => :simulate
     }
 
+    def validate_auth_data(auth_data, is_admin_token)
+      if (!auth_data.nil? && !auth_data.is_a?(Hash))
+        raise ArgumentError, "FirebaseTokenGenerator.create_token: auth data must be a hash"
+      end
+      contains_uid = (!auth_data.nil? and auth_data.has_key?(:uid))
+      if ((!contains_uid and !is_admin_token) or (contains_uid and !auth_data[:uid].is_a?(String)))
+        raise ArgumentError, "FirebaseTokenGenerator.create_token: auth data must contain a :uid key that must be a string."
+      elsif (contains_uid and (auth_data[:uid].length > 256))
+        raise ArgumentError, "FirebaseTokenGenerator.create_token: auth data must contain a :uid key that must not be longer than 256 bytes."
+      end
+    end
+
     def create_options_claims(options)
       opts = {}
       options.each do |key, value|
@@ -59,7 +80,7 @@ module Firebase
         if CLAIMS_MAP.include?(key.to_sym) then
           opts[CLAIMS_MAP[key.to_sym]] = value
         else
-          raise ArgumentError, "#{key.to_s} is not a valid option"
+          raise ArgumentError, "FirebaseTokenGenerator.create_token: #{key.to_s} is not a valid option"
         end
       end
       opts
